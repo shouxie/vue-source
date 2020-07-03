@@ -19,11 +19,14 @@ export const util = {
     },vm)
   },
   compilerText(node,vm) { // 编译文本，替换{{ xxx }}
-    node.textContent = node.textContent.replace(defaultRE, function(...args){
-      console.log(args[1]);
-      return util.getValue(vm,args[1])
-    })
-  }
+    if (!node.expr) {
+      node.expr = node.textContent // 给节点增加了一个自定义属性，为了方便后续更新操作
+    }  
+    node.textContent = node.expr.replace(defaultRE, function(...args){
+        // console.log(args[1]);
+        return JSON.stringify(util.getValue(vm,args[1]))
+      })
+    }
 }
 
 export function compiler(node, vm) {

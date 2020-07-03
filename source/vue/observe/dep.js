@@ -2,7 +2,7 @@
 /*
  * @Author: shouxie
  * @Date: 2020-06-30 18:35:45
- * @Description: 
+ * @Description: 依赖收集
  */ 
 let id = 0;
 class Dep {

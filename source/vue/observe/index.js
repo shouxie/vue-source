@@ -7,7 +7,7 @@
 import Observer from './observer';
 
 export function initState(vm){
-  console.log('initstate');
+  // console.log('initstate');
   // 做不同的初始化工作
   let opts = vm.$options;
   if (opts.data) {
@@ -17,13 +17,17 @@ export function initState(vm){
     initComputed(); // 初始化计算属性
   }
   if (opts.watch) {
-    initWatch(); // 初始化watch
+    initWatch(vm); // 初始化watch
   }
 }
 export function observe(data) {
   if (typeof data !== 'object' || data == null) {
     return // 不是对象或者是null 不用执行后续逻辑
   }
+  if (data.__ob__) { // 已经被监控过了
+    return data.__ob__
+  }
+  // console.log(data, 'data')
   return new Observer(data)
 }
 
@@ -51,7 +55,14 @@ function initData(vm){ // 将用户传入的数据，通过object.definePrototyp
 function initComputed() {
 
 }
-
-function initWatch() {
-
+function createWatcher(vm,key,handler) {
+  // 内部最终也会使用$watch方法
+  return vm.$watch(key,handler)
+}
+function initWatch(vm) {
+  let watch = vm.$options.watch // 获取用户传入的watch
+  for(let key in watch) { // msg() {} msg:[(){},(){}(){}]
+    let handler = watch[key];
+    createWatcher(vm,key,handler)
+  }
 }

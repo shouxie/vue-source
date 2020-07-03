@@ -13,11 +13,16 @@ let vm = new Vue({
       msg: 'hello11',
       school: {name: 'zf', age: 10},
       arr: [12,3,4],
-      arr1: [{a:1},2,3]
+      arr1: [{a:1},2,3],
+      arr2: [['hello'],2,3]
     }
   },
   computed: {},
-  watch: {}
+  watch: {
+    msg(newVal,oldVal) {
+      console.log(newVal,oldVal)
+    }
+  }
 });
 // 希望：vm.msg = vm_data.msg // 代理
 // console.log(vm, 'src/index', vm.msg);
@@ -29,8 +34,22 @@ let vm = new Vue({
 // console.log('vm.arr', vm.arr.push(4), vm.arr)
 
 // 如果新增的属性也是对象类型，我们需要对这个对象，也进行观察，observe
-console.log('vm.arr', vm.arr.push({a:1}), vm.arr[3].a)
-console.log(vm.arr1[0]['a'] = 100)
+// console.log('vm.arr', vm.arr.push({a:1}), vm.arr[3].a)
+// console.log(vm.arr1[0]['a'] = 100)
+
+setTimeout(() => {
+  // vm.msg = 'world' // [dep] = [渲染watcher]
+  // vm.msg = 'world1'
+  // vm.msg = 'world2'
+  // vm.school.name = 'world2'// [dep] = [渲染watcher]
+  // vm.msg = 'world3' // 最终就拿 vm.msg = 'world3'更新就行，不需要更新4次
+  // vue 的特点就是批量更新，防止重复渲染
+  // console.log(vm)
+  // vm.arr2[0].push(100)
+  // vm.arr.push(123) // 更改数组中对象的属性是可以的，因为我们拦截了对象的get和set
+  //----------watch的使用
+  vm.msg = 'world1'
+},1000)
 
 /**
  * 什么样的数组会被观测。

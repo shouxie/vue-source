@@ -37,10 +37,11 @@ function query(el) {
 
 
 Vue.prototype._update = function() {
+  console.log('更新操作')
   // 用用户传入的数据去更新视图
   let vm = this;
   let el = vm.$el;
-  console.log(el);
+  // console.log(el);
 
 
   // 以下逻辑会用虚拟dom重写
@@ -58,7 +59,7 @@ Vue.prototype._update = function() {
 
 
   el.appendChild(node);
-  console.log(node)
+  // console.log(node)
 
 }
 Vue.prototype.$mount = function() {
@@ -71,13 +72,17 @@ Vue.prototype.$mount = function() {
   // 渲染watcher，用于渲染的watcher
   // vue2.0 组件级别更新 new Vue 产生一个组件
   let updateComponent = () => { // 更新组件，渲染的逻辑
-      console.log('执行')
+      // console.log('执行')
       vm._update(); // 更新组件
   }
   new Watcher(vm, updateComponent) // 渲染watcher，默认会调用updateComponent这个方法
   // 希望让每个数据更改了，需要重新渲染
 }
-
+Vue.prototype.$watch= function(expr,handler) {
+  // 创建一个watcher
+  let vm = this
+  new Watcher(vm,expr,handler,{user:true}) // 用户自己定义的watch
+}
 export default Vue
 
 

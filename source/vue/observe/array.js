@@ -33,12 +33,22 @@ export function observerArray(inserted) { // 循环数组依次对数组中每�
   }
 }
 
+export function dependArray(value) { // 递归收集数组中的依赖
+  for (let i = 0;i< value.length;i++) { // 有可能也是一个数组
+    let currentItem = value[i]
+    currentItem.__ob__ && currentItem.__ob__.dep.depend()
+    if (Array.isArray(currentItem)) {
+      dependArray(currentItem) // 不停的收集数组中的依赖关系
+    }
+  }
+}
+
 methods.forEach(method => {
   arrayMethods[method] = function(...args) { // 函数劫持，切片编程
     // arr.push(1,2,3) args=[1,2,3] 把参数塞进一个数组
     // Array.prototype.push() call bind apply
     let r = oldArrayProtoMethods[method].apply(this,args);
-    console.log('调用老数组最新的方法');
+    // console.log('调用老数组最新的方法');
     let inserted;
     switch (method) { // 只对新增的属性 再次进行观测 其他方法没有新增属性
       case 'push':
@@ -50,6 +60,7 @@ methods.forEach(method => {
       default: break;
     }
     if (inserted) observerArray(inserted);
+    this.__ob__.dep.notify() // 通知视图更新
     return r;
   }
 })
