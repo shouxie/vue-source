@@ -71,7 +71,12 @@ function createComputedGetter(vm, key) {
   }
 
 }
-
+/* 计算属性 特点：默认不执行，等用户取值的时候再执行，会缓存取值的结果
+如果依赖的值变化了 会更新dirty属性，再次取值时可以重新求新值*/
+/*
+watch 方法 不能用在模版中，监控的逻辑放在watch中即可
+*/ 
+// watcher 三类：渲染watcher 用户watcher 计算属性watcher
 function initComputed(vm, computed) {
   // 将计算属性的配置放到vm 上
   let watchers = vm._watchersComputed = Object.create(null); // 创建存储计算属性的watcher对象
