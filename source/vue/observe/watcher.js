@@ -18,6 +18,7 @@ class Watcher { // 每次产生一个watcher都要有一个唯一的标识
 
 
    // vm msg (newVal,oldVal) => {} {user:true}
+   // vm  ()=>{this.firstName+this.lastName} lazy:true
   constructor(vm, exprOrFn, cb=() =>{}, opts={}) {
     this.vm = vm;
     this.exprOrFn = exprOrFn;
@@ -31,28 +32,52 @@ class Watcher { // 每次产生一个watcher都要有一个唯一的标识
     if (opts.user) { // 标识是用户自己写的watch
       this.user = true;
     }
+    this.lazy = opts.lazy // 如果这个值为true 说明他是计算属性
+    this.dirty = this.lazy;
     console.log(this.getter(),exprOrFn,cb)
     this.cb = cb;
     this.depsId = new Set()
     this.opts = opts;
     this.id = id++;
+    this.immediate = opts.immediate
     this.deps = []
     // 创建watcher的时候，先将表达式对应的值取出来，老值
-    this.value = this.get() // 默认创建一个watcher 会调用自身的get方法
+    // 如果当前我们是计算属性的话 不会默认调用get方法
+    this.value = this.lazy ? undefined : this.get() // 默认创建一个watcher 会调用自身的get方法
+    if (this.immediate) { // 如果有immediate 就直接运行用户定义的函数
+      this.cb(this.value)
+    }
   }
 
   get() {
     // 默认创建watcher会执行此方法
     // Dep.target = 用户的watcher
     pushTarget(this) // 渲染watcher Dep.target = watcher msg变化了，需要让这个watcher重新执行
-    let value = this.getter() // 让这个当前传入的函数执行
+    
+    // fullName(){return this.firstName + this.lasetName}
+    // dep = [watcher] dep = wtacher
+    // 函数调用时就会将计算属性watcher 存起来
+    let value = this.getter.call(this.vm) // 让这个当前传入的函数执行
     popTarget()
+    // if (this.immediate) {
+    //   this.cb(value,this.value)
+    // }
     return value
+  }
+
+  evalute() {
+    this.value = this.get()
+    this.dirty = false; // 值求过了，下次渲染时候不用求了
   }
 
   update() { // 如果立即调用get，会导致页面刷新 需要异步来更新
     console.log(this.id)
-    queueWatcher(this)
+    if (this.lazy) { // 如果时计算属性
+      this.dirty = true // 计算属性依赖的值变化了 稍后取值时重新计算下
+    } else {
+      queueWatcher(this)
+    }
+    
     // this.get()
   }
 
@@ -69,6 +94,14 @@ class Watcher { // 每次产生一个watcher都要有一个唯一的标识
       this.depsId.add(id)
       this.deps.push(dep); // 就让watcher记住了当前的dep
       dep.addSub(this);
+    }
+  }
+
+  depend(){
+    let i = this.deps.length;
+    console.log(i)
+    while(i--){
+      this.deps[i].depend()
     }
   }
 }

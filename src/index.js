@@ -14,13 +14,25 @@ let vm = new Vue({
       school: {name: 'zf', age: 10},
       arr: [12,3,4],
       arr1: [{a:1},2,3],
-      arr2: [['hello'],2,3]
+      arr2: [['hello'],2,3],
+      firstName: 'qiao',
+      lastName: 'pan'
     }
   },
-  computed: {},
+  computed: {
+    fullName() {
+      return this.firstName + this.lastName
+    }
+  },
   watch: {
-    msg(newVal,oldVal) {
-      console.log(newVal,oldVal)
+    // msg(newVal,oldVal) {
+    //   console.log(newVal,oldVal)
+    // }
+    msg: {
+      handler(newVal,val){
+        console.log(newVal,val, '123')
+      },
+      immediate: true
     }
   }
 });
@@ -48,7 +60,9 @@ setTimeout(() => {
   // vm.arr2[0].push(100)
   // vm.arr.push(123) // 更改数组中对象的属性是可以的，因为我们拦截了对象的get和set
   //----------watch的使用
-  vm.msg = 'world1'
+  // vm.msg = 'world1'
+  // ----------computed的使用
+  vm.firstName = 'hello' // firstName [watcher 计算属性watcher 渲染watcher]
 },1000)
 
 /**

@@ -5,6 +5,8 @@
  * @Description: t 
  */ 
 import Observer from './observer';
+import Watcher from './watcher';
+import Dep from './dep';
 
 export function initState(vm){
   // console.log('initstate');
@@ -14,7 +16,7 @@ export function initState(vm){
     initData(vm); // 初始化数据
   }
   if (opts.computed) {
-    initComputed(); // 初始化计算属性
+    initComputed(vm,opts.computed); // 初始化计算属性
   }
   if (opts.watch) {
     initWatch(vm); // 初始化watch
@@ -52,17 +54,50 @@ function initData(vm){ // 将用户传入的数据，通过object.definePrototyp
   observe(vm._data); // 观察数据
 }
 
-function initComputed() {
+function createComputedGetter(vm, key) {
+  let watcher = vm._watchersComputed[key] // 这个watcher 就是我们定义的计算属性watcher
+  return function() { // 用户在取值时会执行此方法
+    if (watcher) {
+      // 如果dirty 是false的话不需要重新执行计算属性中的方法
+      if (watcher.dirty){ // 如果页面取值，而且dirty是true，就会调用watcher 的get方法
+        watcher.evalute()
+
+      }
+      if (Dep.target){ // watcher 就是计算属性watcher dep=[firstname.dep lastname.dep]
+        watcher.depend()
+      }
+      return watcher.value
+    }
+  }
 
 }
-function createWatcher(vm,key,handler) {
+
+function initComputed(vm, computed) {
+  // 将计算属性的配置放到vm 上
+  let watchers = vm._watchersComputed = Object.create(null); // 创建存储计算属性的watcher对象
+  for (let key in computed) { // computed : fullName(){return this.firstName+this.lastName}
+    let userDef = computed[key];
+    // new watcher 此时 什么都不会做，配置了lazy dirty
+    watchers[key] = new Watcher(vm,userDef,()=>{},{lazy:true}) // 计算属性watcher，默认刚开始这个方法不会执行
+    //vm.fullName 将这个属性定义到vm上
+    Object.defineProperty(vm,key,{
+      get:createComputedGetter(vm,key)
+    })
+  }
+
+}
+function createWatcher(vm,key,handler,opts) {
   // 内部最终也会使用$watch方法
-  return vm.$watch(key,handler)
+  return vm.$watch(key,handler,opts)
 }
 function initWatch(vm) {
   let watch = vm.$options.watch // 获取用户传入的watch
   for(let key in watch) { // msg() {} msg:[(){},(){}(){}]
-    let handler = watch[key];
-    createWatcher(vm,key,handler)
+    let userDef = watch[key];
+    let handler = userDef;
+    if (userDef.handler) {
+      handler = userDef.handler;
+    }
+    createWatcher(vm,key,handler,{immediate:true})
   }
 }

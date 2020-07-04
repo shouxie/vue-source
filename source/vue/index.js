@@ -78,10 +78,10 @@ Vue.prototype.$mount = function() {
   new Watcher(vm, updateComponent) // 渲染watcher，默认会调用updateComponent这个方法
   // 希望让每个数据更改了，需要重新渲染
 }
-Vue.prototype.$watch= function(expr,handler) {
+Vue.prototype.$watch= function(expr,handler,opts) {
   // 创建一个watcher
   let vm = this
-  new Watcher(vm,expr,handler,{user:true}) // 用户自己定义的watch
+  new Watcher(vm,expr,handler,{user:true,...opts}) // 用户自己定义的watch
 }
 export default Vue
 
