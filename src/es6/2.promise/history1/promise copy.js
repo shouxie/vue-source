@@ -52,17 +52,14 @@ const resolvePromise = (promise2, x,resolve,reject) => {
  }
 
 }
-class Promise{
+class Promise1{
   constructor(executor){
     this.value = ''
     this.reason = ''
     this.status = PENDING
     this.onResolveCallbacks = []
     this.onRejectedCallbacks = []
-    let resolve = (value) => { // value 有可能是个promise
-      if (value instanceof Promise){
-        return value.then(resolve,reject)
-      }
+    let resolve = (value) => {
       if (this.status === PENDING) {
         this.status = RESOLVED
         this.value = value
@@ -137,13 +134,9 @@ class Promise{
     })
     return promise2
   }
-
-  catch(errCallback){ // 没有传入成功的then方法就是catch的原理
-    return this.then(null,errCallback)
-  }
 }
 
-module.exports = Promise
+
 /*
 1) 普通值的情况
 */
@@ -225,29 +218,12 @@ new Promise1((resolve,reject)=>{
 递归
 */
 // 穿透的情况
-/*
-let p1 = new Promise((resolve,reject)=>{
+let p1 = new Promise1((resolve,reject)=>{
   resolve(100)
 })
 p1.then().then().then(data=>{
   console.log(data)
 })
-*/
-
-
-// 如果里面传入的值是promise 会等待这个promise执行完成
-Promise.resolve = function(value){
-  return new Promise((resolve,reject)=>{
-      resolve(value)
-  })
-}
-
-// 直接将原因向下抛出， 没有等待的效果
-Promise.reject = function(reason){
-  return new Promise((resolve,reject)=>{
-      reject(reason)
-  })
-}
 
 
 // 安装 promises-aplus-tests 测试你写的promise是否符合规范
@@ -260,9 +236,8 @@ Promise.defer = Promise.deferred = function(){
   })
   return dfd
 }
+
 // 执行：promises-aplus-tests 文件名
-
-
 
 
 
