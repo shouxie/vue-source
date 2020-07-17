@@ -108,7 +108,7 @@ export function patch(oldVnode, newVnode){
 
 
 function updateChildren(parent,oldChildren,newChildren){
-// vue 增加来很多优化策略 因为在浏览器中操作dom最常见的方法是开头或者结尾插入
+// vue 增加了很多优化策略 因为在浏览器中操作dom最常见的方法是开头或者结尾插入
 // 涉及到正序和倒序
   let oldStartIndex = 0; // 老的索引开始
   let oldStartVnode = oldChildren[0] // 老的节点开始
@@ -121,9 +121,39 @@ function updateChildren(parent,oldChildren,newChildren){
   let newEndVnode = newChildren[newEndIndex]
 
 
-  // while(oldStartIndex<=oldEndIndex && newStartIndex<=newEndIndex){
-  //   if (isSameVNode(oldStartVnode,newStartVnode)){}
-  // }
+  while(oldStartIndex<=oldEndIndex && newStartIndex<=newEndIndex){
+    if (isSameVNode(oldStartVnode,newStartVnode)){// 先看前面是否一样
+      patch(oldStartVnode,newStartVnode) // 用新的属性来更新老的属性
+      oldStartVnode = oldChildren[++oldStartIndex]
+      newStartVnode = newChildren[++newStartIndex]
+    } else if(isSameVNode(oldEndVnode,newEndVnode)){// 从后面看是否一样
+      patch(oldEndVnode,newEndVnode) 
+      oldEndVnode = oldChildren[--oldEndIndex]
+      newEndVnode = newChildren[--newEndVnode]
+    } else if (isSameVNode(oldStartVnode,newEndVnode)){
+      patch(oldStartVnode,newEndVnode) 
+      parent.insertBefore(oldStartVnode.el,oldEndVnode.el.nextSibling)
+      oldStartVnode = oldChildren[++oldStartIndex]
+      newEndVnode=newChildren[--newEndIndex]
+    } else if (isSameVNode(oldEndVnode,newStartVnode)){//老的尾巴和新的头比，将老的尾巴移动到老的头的前面
+      patch(oldEndVnode,newStartVnode) 
+      parent.insertBefore(oldEndVnode.el,oldStartVnode.el.nextSibling)
+      oldEndVnode = oldChildren[--oldEndIndex]
+      newStartVnode=newChildren[++newStartIndex]
+    }
+    // 倒序和正序
+  }
+  if (newStartIndex <= newEndIndex){ // 如果到最后还剩余，需要将剩余到插入
+    for(let i = newStartIndex;i<newEndIndex;i++){
+      // 要插入的元素
+      let ele = newChildren[newEndIndex+1] == null ? null : newChildren[newEndIndex+1].el
+      // 可能是往前面插入，也有可能是往后面插入
+      //insertBefore （插入到元素，null） == appendChild
+      // parent.appendChild(createElm(newChildren[i]))
+      parent.insertBefore(createElm(newChildren[i]),ele)
+    }
+    
+  }
 }
 
 function isSameVNode(oldVnode, newVnode){
