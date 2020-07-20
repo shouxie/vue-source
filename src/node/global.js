@@ -45,6 +45,10 @@ require module exports __dirname __filename
 
 /*
 process 进程
+
+argv 参数
+env 环境变量
+
 node：
 写插件 ：webpack   webpack --config --port --mode production
 前后端分离，解决跨域
@@ -109,4 +113,192 @@ Options:
 
 /*
 commander 命令行工具专用包 解析参数，并且提供命令行帮助文档
+*/
+
+/*
+cross-env 跨平台设置环境变量
+*/
+
+
+/*
+path
+fs
+
+
+fs中的方法，有异步，同样会对应一个同步的方法 exists这个方法的异步被废弃掉了，因为他的回调函数中第一个参数不是err
+fs.exists
+fs.existsSync
+
+path
+
+path.extname() // 判断文件后缀
+
+path.resolve 和 path.join 区别就是
+resolve 遇到/ 会回到根目录
+join 会直接拼接
+
+path.dirname(filename) 根据文件取他的所在目录
+
+console.log(path.resolve(__dirname, 'p.md','/','b'))
+//   /b
+console.log(path.join(__dirname, 'p.md','/','b'))
+
+// /Users/qpp/important/project/vue-source/src/node/p.md/b
+
+*/
+let fs = require('fs')
+let path = require('path')
+// fs.exists
+// console.log(fs.existsSync('./b.js'))
+console.log(path.extname('./readme.md'))
+console.log(path.resolve(__dirname, 'p.md','/','b'))
+//   /b
+console.log(path.join(__dirname, 'p.md','/','b'))
+
+// /Users/qpp/important/project/vue-source/src/node/p.md/b
+
+
+/*
+让一个字符串执行 new Function / eval  这两个方法都会使模块间相互影响
+vm 模块（虚拟机模块）
+
+沙箱环境 干净的执行环境 让字符串执行
+vm.runInThisContext() 
+*/
+
+/*
+调试的适用场景
+命令行调试
+在浏览器中调试   node --inspect-brk xxx.js   调试 停在第一行，浏览器打开 chrome://inspect
+vscode 调试
+*/
+
+/*
+require 同步方法
+
+1. 使用模块上定义的require方法 Module.prototype.require
+2. Module._load 模块的加载方法
+3. Module._resolveFilename 把文件路径转换成绝对路径 会尝试添加.js / .json 文件后缀
+4. Module._cache(filename) 判断当前这个路径有没有在缓存中，如果在缓存中就结束了，绝对路径具有唯一性
+5. new Module 创建一个模块 两个重要属性 id：当前的文件名 exports 当前模块的导出对象
+6. 把当前模块放到缓存中
+7. tryModuleLoad 尝试加载模块
+8. module.load 模块的加载
+9. 先找到文件的扩展名  不同的扩展名处理方式不相同.js/.json
+10. 通过扩展名调用不同的方法 Module._extensions[extension]
+11. 如果是js 读取文件的内容 readFileSync
+12. 将读取到的内容 Module.wrap 进行包裹   Module.warpper[0] + script + Module.wrapper[1]
+const warpper = [
+  '(function(exports,require,module,__filename,__dirname){',
+  '\n})'
+]
+
+将字符串使用 runInThisContext 进行执行，改变this，将参数传入，用户会给参数赋值
+会给module.exports 赋值
+
+最终require方法返回的是module.exports
+*/
+// node commonjs 动态 esModule 静态 umd
+let fs = require('fs')
+let path = require('path')
+let vm = require('vm')
+function Module(filename){
+  this.id = filename
+  this.exports = {}
+}
+function req(filename){
+  filename = Module._resolveFilename(filename)
+  let cacheModule = Module._cache[filename]
+  if (cacheModule){
+    return cacheModule.exports // 做了一层缓存 不必再读取文件了
+  }
+  let module = new Module(filename) // 创建一个模块，模块中有两个属性 exports id
+  Module._cache[filename] = module
+  module.load() // 加载模块 用户会给module.exports 赋值
+  return module.exports
+}
+Module.warpper = [
+  '(function(exports,require,module,__filename,__dirname){',
+  '\n})'
+]
+
+Module._extensions = {
+  '.js'(module){ // 处理js
+    let content = fs.readFileSync(module.id,'utf8')
+    content = Module.warpper[0] + content + Module.warpper[1]
+    let fn = vm.runInThisContext(content)
+    let exports = module.exports
+    fn.call(exports,exports,req,module,module.id,path.dirname(module.id))
+  },
+  '.json'(module){
+    let content = fs.readFileSync(module.id,'utf8')
+    module.exports = JSON.parse(content)
+  }
+}
+Module._resolveFilename = function(filename){
+  let abspath = path.resolve(__dirname,filename) // 算出一个绝对路径
+  let isExists = fs.existsSync(abspath)
+  if (isExists) {
+    return abspath
+  } else {
+    let keys = Object.keys(Module._extensions)
+
+
+    for (let i =0;i<keys.length;i++){
+      let newPath = abspath + keys[i]
+      let flag = fs.existsSync(newPath)
+      if (flag) {
+        return newPath
+      }
+    }
+    throw new Error('module not found')
+  }
+}
+Module.prototype.load = function(){
+  // 核心加载方法
+  let extname = path.extname(this.id)
+  Module._extensions[extname](this)
+}
+
+/*
+总结：
+模块：
+核心模块（不需要安装，不需要自己写）
+文件模块：必须路径是相对路径或者绝对路径
+第三方模块 和核心模块一样 但是需要安装
+
+
+文件引用规则：
+每个版本都不太一样
+
+新版本中会先查找文件 再查找文件夹 如果没有匹配文件 
+会找文件夹 如果文件夹下有package.json 
+找main入口 如果有 引入main
+否则找index.js
+
+
+第三方的查找路径：
+先找当前目录下的node_modules 找不到向上查找
+console.log(module.paths) 
+第三方需要安装 但是不能使用全局模块，global安装的找不到（只能在命令行中使用）
+
+module.exports === exports // true
+module.exports = 'hello' // res:hello
+exports = 'hello' // res:{} 错误用法
+let res = require('xxxx')
+源码：
+let exports= module.exports = {}
+module.exports = 'hello'
+return module.exports
+
+如果exports.a = 'hello' 这个可以，因为相当于给module.exports 也加了a
+
+
+es6是合并关系，node中如果都写，采用的module.exports
+*/
+
+
+
+/*
+
 */
