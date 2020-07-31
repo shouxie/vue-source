@@ -210,3 +210,33 @@ async function rmdir(url){
 rmdir('e').then(function(){
   console.log('删除成功')
 })
+
+
+
+// 广度遍历 异步并行
+// 写递归导致 栈执行过多  -》 栈行结构 数组取代创建函数
+
+let wideSync = (root) =>{
+  let arr = [root]
+  let index = 0;
+  let current;
+  while(current = arr[index++]){ // current返回值会作为while循环的结果
+    let statObj = fs.statSync(current)
+    if (statObj.isDirectory()){
+      let dirs = fs.readdirSync(current)
+      arr = arr.concat(dirs.map(dir => path.join(current,dir)))
+    }else {
+      arr[index] = undefined
+      fs.unlinkSync(current)
+    }
+
+  }
+  console.log(arr)
+  while(--index>=0){ // 倒序删除
+    if (arr[index]){
+      fs.rmdirSync(arr[index])
+    }
+  }
+}
+
+wideSync('a')
