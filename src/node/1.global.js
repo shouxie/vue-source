@@ -48,6 +48,7 @@ process 进程
 
 argv 参数
 env 环境变量
+cwd 当前的工作目录 current working directory 在哪里运行的
 
 node：
 写插件 ：webpack   webpack --config --port --mode production
@@ -300,5 +301,78 @@ es6是合并关系，node中如果都写，采用的module.exports
 
 
 /*
+process.nextTick node 中自带的微任务 让当前的方法变成异步方法
 
+
+
+node 事件环 11版本之后 执行方式和浏览器一致
+
+
+timers    定时器， setInterval
+
+不考虑=pending callbacks   系统会把上一轮没有执行完的 在本次事件环中执行
+
+不考虑=idle prepare  内部的准备操作
+
+poll   轮训阶段   执行io操作 readFile等
+
+check  setImmediate方法    
+
+不考虑=close callbacks   tcp 关闭事件
+
+
+
+
+微任务队列： nextTick比 promise.then 优先
 */
+
+/*
+代码执行主栈
+默认看执行当前主栈代码 执行完毕后 清空所有微任务 拿到timer中的队列 取出第一个执行
+执行完毕后 再清空所有微任务 再取出第二个timer 如果没有timer 会进入到poll阶段，
+如果有check 会向下执行 如果没有，就执行对应的io的回调 如果没有其他的 会在这个阶段进行等待
+等待定时器到达时间返回
+*/
+// 有这么一个定时器：
+
+// setTimeout(() => console.log('我第一'), 3000);
+// 站在宏观思想上理解，这行代码的意思是这个定时器将在三秒后触发，但站在微观的角度上，3000ms并不代表执行时间，而是将回调函数加入任务队列的时间
+
+// setTimeout 和 setimmediate 执行顺序不固定 受进程影响
+setTimeout(() => {
+  console.log('timer')
+}, 0);
+
+setImmediate(()=>{
+  console.log('immediate')
+})
+/*
+setTimeout(() => {
+  console.log('1')
+}, 1000);
+setTimeout(() => {
+  console.log('2')
+  Promise.resolve().then(()=>{
+    console.log('3')
+    setTimeout(() => {
+      console.log('4')
+    }, 500);
+  })
+}, 500);
+*/
+
+let fs = require('fs')
+fs.readFile('./readme.md','utf8',()=>{
+  console.log(1)
+  // setImmediate(()=>{
+  //   console.log('2')
+  // })
+})
+
+setTimeout(() => {
+  console.log('timer')
+}, 0);
+
+setImmediate(()=>{
+  console.log('immediate')
+})
