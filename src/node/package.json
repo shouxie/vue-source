@@ -1,0 +1,15 @@
+{
+  "name": "node",
+  "version": "1.0.0",
+  "description": "<!--  * @Author: shouxie  * @Date: 2020-07-17 17:07:29  * @Description:  -->  node runtime 可以把js 运行在服务端",
+  "main": "1.global.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "mime": "^2.4.6"
+  }
+}

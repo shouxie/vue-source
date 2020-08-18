@@ -5,6 +5,12 @@
  * @Date: 2020-07-17 17:45:10
  * @Description: 
  */ 
+
+/*
+基本数据类型 string number boolean null undefined
+symbol bigInt
+*/
+
 /* 全局对象 global 只要不声明 可以直接使用的就是全局对象
 如果变量放到了global上，那这个值肯定是一个全局对象
 ex： export console
