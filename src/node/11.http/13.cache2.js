@@ -51,32 +51,58 @@ class Server {
       this.sendError(req,res)
     }
   }
-  sendFile(req,res,absPath,statObj){
-    // 多次访问服务器 会不停的读取文件返回，如果连续访问我，可以做缓存
-    // 1 强制缓存 像max-age 多少秒之内不要再访问了  状态码还是200，只对当前文件引用的资源生效，不对首页生效
-    // 10s内访问相同的资源不要再访问我了
-    // Exipres Cache-Control 兼容
-    res.setHeader('Exipres',new Date(Date.now()+10000).toGMTString())
+  cache(req,res,absPath,statObj){
+    // 1 设置强制缓存和对比缓存
+    res.setHeader('Expires',new Date(Date.now()+10000).toGMTString())
     res.setHeader('Cache-Control','max-age=10')
-    res.setHeader('Content-Type',mime.getType(absPath)+';charset=utf-8')
-    // 浏览器自动判断 disk cache 硬盘缓存  memory cache 内存 比较快，使用频繁的可以存入
-    res.setHeader('Cache-Control','no-cache') // 每次都强制向服务器发请求，不访问缓存，禁用缓存
-    res.setHeader('Cache-Control','no-store') // 不存储缓存
 
-    // 2 对比缓存，协商缓存
-    let lastModified = statObj.ctime.toGMTString()
-    
-    let ifModifiedSince = req.headers['if-modified-since']
-    res.setHeader('Last-Modified',lastModified)
-    // 设置了Last-Modified，浏览器请求自动带上if-modified-since
-    if (ifModifiedSince==lastModified){
-      // 以秒为单位 不够准确，可能最后修改时间变了，但是文件没变
-      res.statusCode = 304
-      res.end() // 走缓存
-      return
+    let eTag = statObj.size + ''
+    let ctime = statObj.ctime.toGMTString()
+
+    res.setHeader('Etag',eTag)
+    res.setHeader('Last-Modified',ctime)
+
+    let clientIfNoneMatch = req.headers['if-none-match']
+    let clientIfModifiedSince = req.headers['if-modified-since']
+    let flag = true;
+    // etag 每个 koa express 生成的方式都不一样
+    if(eTag !== clientIfNoneMatch){
+      flag = false
     }
-    // 根据文件内容 做对比缓存，服务端根据文件内容 产生一个唯一的标示，下次访问时带上标示来比对
+    if(clientIfModifiedSince !== ctime){
+      flag = false;
+    }
     
+    // if(eTag)
+    return flag
+  }
+
+  gzip(req,res,absPath,statObj){
+    let encoding = req.headers['accept-encoding']
+    let zlib = require('zlib')
+    if(encoding.includes('gzip')){
+      res.setHeader('Content-Encoding','gzip')
+      return zlib.createGzip()
+    }else if (encoding.includes('deflate')){
+      res.setHeader('Content-Encoding','deflate')
+      return zlib.createDeflate()
+    }
+    return false;
+
+  }
+  async sendFile(req,res,absPath,statObj){
+    // 制作缓存
+    if (this.cache(req,res,absPath,statObj)){
+      res.statusCode= 304
+      return res.end()
+
+    }
+    // 如果没缓存，希望将文件压缩后返回
+    let zip = this.gzip(req,res,absPath,statObj)
+    if(zip){ // 如果支持。默认返回的就是一个压缩流
+      return  createReadStream(absPath).pipe(zip).pipe(res)
+    }
+    res.setHeader('Content-Type',mime.getType(absPath)+';charset=utf-8')
     createReadStream(absPath).pipe(res)
   }
   sendError(req,res){
@@ -93,3 +119,8 @@ let server = new Server()
 server.start(8080,function(){
   console.log('server start 8080')
 })
+
+
+//服务器 Content-Encoding：gzip
+//客户端 Accept-Encoding：gzip，deflate，br
+// 压缩 转化流 支持回调的写法
