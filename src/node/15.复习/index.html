@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body style="height: 2000px;">
+  
+</body>
+<script>
+  var body = document.body
+  function debounce(fn,delay){ // 节流
+    let timer = null
+    return function(){
+      clearTimeout(timer)
+      timer = setTimeout(()=>{
+        fn.call(this,...arguments)
+      },delay)
+
+    }
+  }
+
+  function throttle(fn,delay){
+    let start = Date.now()
+    return function(){
+      let last = Date.now()
+      if (last - start > delay){
+        fn.apply(this,arguments)
+        start = last
+      }
+    }
+
+  }
+// body.onscroll = throttle(function(){
+//   console.log('滚动')
+// },1000)
+
+
+// body.onclick=throttle(function(){
+//   console.log('滚动')
+// },1000)
+const p = Promise.resolve()
+;(()=>{
+  const implicit_promise = new Promise(resolve=>{
+    const promise = new Promise(res=>res(p))
+    promise.then(()=>{
+      console.log('after:await')
+      resolve()
+    })
+  })
+  return implicit_promise
+})()
+p.then(()=>{
+  console.log('tick:a')
+}).then(()=>{
+  console.log('tick:b')
+}).then(()=>{
+  console.log('tick:c')
+})
+</script>
+</html>
