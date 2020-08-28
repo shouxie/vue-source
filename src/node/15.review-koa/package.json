@@ -1,0 +1,20 @@
+{
+  "name": "15.review",
+  "version": "1.0.0",
+  "description": "",
+  "main": "1.session.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ejs": "^3.1.5",
+    "jwt-simple": "^0.5.6",
+    "koa-bodyparser": "^4.3.0",
+    "koa-router": "^9.4.0",
+    "koa-views": "^6.3.0",
+    "uuid": "^8.3.0"
+  }
+}

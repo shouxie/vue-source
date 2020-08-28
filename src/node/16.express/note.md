@@ -1,0 +1,6 @@
+- koa express 都有中间件
+- 区别koa基于promise async+await语法，express基于回调的方式（没有基于promise）
+- express 错误处理也是基于回调的
+- koa-static koa-router 等 koa（小），没有扩展插件需要自己封装。express自己封装了一些中间件自身有路由系统和静态服务
+- express 生存时间比koa长 基于es5写的
+- koa：ctx 上下文，自己也封装了req，res，express只是在原生的req和res上进行了扩展
