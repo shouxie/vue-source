@@ -37,7 +37,7 @@ console.log(Object.keys(global)):
 */
 
 
-// console.log(this) // this默认在文件中并不少global this= nodule.exports
+// console.log(this) // this默认在文件中并不是global this= module.exports
 
 /*
 node 模块化的概念，默认文件外面包了一个函数 函数 里面的this被更改了
