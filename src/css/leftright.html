@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div class="box left"></div>
+  <div class="box right"></div>
+
+  <div class="par">
+    <div class="chi"></div>
+  </div>
+</body>
+</html>
+<style>
+  .box{
+    height:300px;
+  }
+  .left{
+    width:300px;
+    position:absolute;
+    /* float:left; */
+    background: tomato;
+  }
+  .right{
+    /* margin-left:300px; */
+    overflow: hidden;
+    background:red;
+  }
+
+  .par::after .chi{
+    display:inline-block;
+    vertical-align:middle;
+  }
+  .par{
+    background:red;
+    height:100px;
+  }
+  .chi{
+    background:#000;
+    height:20px;
+  }
+  .par::after{
+    height:100%;
+    content: '';
+
+  }
+</style>

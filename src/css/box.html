@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div class="shape"></div>
+  <div class="box"></div>
+
+  <div class="layout">
+    <div class="layout left"></div>
+    <div class="layout right"></div>
+  </div>
+</body>
+</html>
+<style>
+  .shape{
+    height:0;width:0;
+    border-top: 10px solid transparent;
+    border-left:10px solid transparent;
+    border-right:10px solid transparent;
+    border-bottom:10px solid #000;
+  }
+  .box{
+    width:100px;
+    height: 100px;
+    background-color: black;
+    box-sizing:border-box;
+    border:1px solid red;
+    padding: 20px;
+  }
+
+  .layout{
+    width:100px;
+    background-color: black;
+    /* display: table; */
+    display: flex;
+    /* align-items: stretch; */
+  }
+  .layout div{
+    /* display:table-cell; */
+    width: 50%;
+    background: red;
+
+  }
+  .layout .left{
+    height:200px;
+    background: yellow;
+  }
+</style>
