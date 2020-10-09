@@ -64,3 +64,59 @@ jsonp({
         return acc;
     },[]).join('&');
   }
+
+
+
+
+
+  function jsonp(obj){
+    return new Promise((resolve,reject)=>{
+      // let {url,params}=obj;
+      
+      let path = parseUrl(obj.params);
+      let fn = `jsonp_${Date.now()}`;
+      if(path.indexOf('callback')===-1){
+        path=path+'&callback'+fn;
+      }else{
+        fn = /callback=(\w+)/.exec(path)[1];
+      }
+      createScript(path);
+      window[fn]=function(res){
+        if(res){
+          resolve(res);
+        }else{
+          reject('error');
+        }
+      }
+     
+      
+      
+
+    });
+  }
+
+  function parseUrl(url,params){
+    let path = '';
+    if(Object.prototype.toString.call(params) === '[Object String]'){
+      path=url+'?'+params;
+    }else{
+      let arr = [];
+      for(let key in url){
+        arr.push(`${key}=${encodeURIComponent(url[key])}`);
+      }
+      path=url+'?'+arr.join('&');
+      // url.split('&').reduce((prev,cur)=>{
+      //   let [name,value] = cur.split('=')
+      // })
+      return path;
+      
+    }
+  }
+  function createScript(src){
+    let script = document.createElement('script');
+    script.src=src;
+    script.type="text/javascript";
+    let head = document.querySelector('head');
+    head.appendChild(script);
+
+  }

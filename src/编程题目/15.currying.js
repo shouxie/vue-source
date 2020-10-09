@@ -30,3 +30,26 @@ function add(a,b,c){
 add(1,2,3) // 6
 var curryingAdd = currying(add);
 curryingAdd(1)(2)(3) // 6
+
+
+
+// my code
+function currying(fn,...args){
+  if(fn.length <= args.length){
+    return fn(...args);
+  }
+  return function(...args1){
+    return currying(fn,...args1,...args);
+  }
+
+}
+
+
+function currying(fn,...args){
+  if(fn.length <= args.length){
+    return fn(...args);
+  }
+  return function(...args1){
+    return currying(...args1,...args);
+  }
+}

@@ -215,5 +215,5 @@ function quick_sort(arr){
       right.push(arr[i]);
     }
   }
-  return quick_sort(left).concat(midItem,right)
+  return quick_sort(left).concat(quick_sort(midItem),quick_sort(right))
 }

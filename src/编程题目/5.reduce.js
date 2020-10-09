@@ -27,3 +27,19 @@ Array.prototype.reduce=function(callback,initValue){
   }
   return value;
 }
+
+
+// mycode
+Array.prototype.reduce=function(callback,initVal){
+  if(typeof this == undefined || !this.length || typeof callback!=='function'){
+    return [];
+  }
+
+  let arr = this;
+  let hasInit = initVal !== undefined;
+  let value = hasInit?initVal:arr[0];
+  for(let i=hasInit?0:1;i<arr.length;i++){
+    value = callback(value,arr[i],i,arr);
+  }
+  return value;
+}

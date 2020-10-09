@@ -21,3 +21,14 @@ function new1(func){
   let res = func.call(obj);
   return typeof res === 'object'||typeof res === 'function' ? res : obj;
 }
+
+
+// my code
+
+function new1(fn,...args){
+	let obj = {};
+	obj.__proto__ = fn.prototype;
+	let res = fn.call(obj,...args);
+	return typeof res === 'object' ? res : obj;
+
+}

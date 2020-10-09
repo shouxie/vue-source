@@ -27,3 +27,45 @@ function flattenByDeep(arr,deep){
   }
   return res;
 }
+
+
+// reduce
+const flatten = arr =>{
+  return arr.reduce((prev,cur)=>{
+    return prev.concat(Array.isArray(cur)?flatten(cur):cur)
+  },[])
+}
+
+// 正则 [1,[2,3],[4,[5,[6]]]]
+const flatten = arr=>{
+  return JSON.parse('['+JSON.stringify(arr).replace(/[\[\]]/g,'')+']');
+}
+console.log(flatten([1,[2,3],[4,[5,[6]]]]))
+
+
+let arr = [1,[2,3],[4,[5,[6]]]]
+console.log(arr.flat(Infinity))
+
+
+
+// my code
+const flat = arr =>{
+  let result = [];
+  for(let i=0;i<arr.length;i++){
+    if(Array.isArray(arr[i])){
+      return result.concat(flat(arr[i]));
+    }else{
+      return result.push(arr[i]);
+    }
+  }
+}
+
+const flat = arr =>{
+  return JSON.parse('['+JSON.stringify(arr).replace(/[\[\]]/g,'')+']');
+}
+
+const flat = arr =>{
+  return arr.reduce((prev,cur)=>{
+     return prev.concat(Array.isArray(cur)?flat(cur):cur);
+  },[]);
+}
