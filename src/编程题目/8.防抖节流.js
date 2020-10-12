@@ -52,3 +52,29 @@ function thorttle(fn,time){
     },time)
   }
 }
+
+
+function debonce(fn,time){
+  let timer = null;
+  return function(){
+    if(timer){
+      clearTimeout(timer);
+    }
+    timer = setTimeout(() => {
+      fn.apply(this,arguments);
+
+    }, time);
+  }
+}
+
+function throttle(fn,time){
+  let canrun = true;
+  return function(){
+    if(!canrun) return;
+    canrun=false;
+    setTimeout(() => {
+      fn.apply(this,arguments);
+      canrun=true;
+    }, time);
+  }
+}

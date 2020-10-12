@@ -31,3 +31,19 @@ Array.prototype.filter=function(fn,context){
   }
   return res;
 }
+
+
+
+function fil(fn,context){
+  if(typeof fn !== 'function'){
+    throw new Error('');
+  }
+  let res = [];
+  for(let i=0;i<arr.length;i++){
+    let temp = context.call(context,arr[i],i,arr);
+    if(temp){
+      res.push(arr[i]);
+    }
+  }
+  return res;
+}

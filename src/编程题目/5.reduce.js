@@ -43,3 +43,34 @@ Array.prototype.reduce=function(callback,initVal){
   }
   return value;
 }
+
+
+
+
+
+Array.prototype.reduce=function(fn,initVal){
+  if(typeof fn !== 'function' || !Array.isArray(this)){
+    return [];
+  }
+  let hasinit = initVal !== undefined;
+  let value = hasinit?initVal:this[0];
+  for(let i=hasinit?0:1;i<this.length;i++){
+    value = fn(value,this[i],i,this);
+  }
+  return value;
+}
+
+
+
+
+Array.prototype.reduce=function(callback,initVal){
+  if(typeof callback !== 'function' || !this.length || Array.isArray(this)){
+    return [];
+  }
+  let hasInit = initVal !== undefined;
+  let value = hasInit ? initVal:this[0]; 
+  for(let i = hasInit ? 0:1;i<this.length;i++){
+    value = callback(value,this[i],i,this);
+  }
+  return value;
+}

@@ -58,6 +58,119 @@ function handle(obj,key,value){
   }
   obj[key[i]]=decodeURIComponent(value)
 }
-console.log(parse('a[0]=1&a[1]=2&c[name]=fox&c[company]=tecent&b=why'))
+// console.log(parse('a[0]=1&a[1]=2&c[name]=fox&c[company]=tecent&b=why'))
 
-// console.log('[123]aa[]b[he]'.split(/[\[\]]/g))
+// console.log('a[0]=1&a[1]=2&c[name]=fox&c[company]=tecent&b=why'.split(/[\[\]]/g))
+
+
+
+//'a[0]=1&a[1]=2&c[name]=fox&c[company]=tecent&b=why'
+// function querystring(str){
+//   let obj = str.split('&').reduce((pre,cur)=>{
+//     let [name,value]=cur.split('=');
+//     pre[name]=value;
+//     let k = name.split(/[\[\]]/).filter(x=>x);
+//     fn(prev,k,value);
+//     return prev;
+//   },{});
+//   return obj;
+// }
+// // 'a[0]=1&a[1]=2' => a:[1,2]
+// function fn(obj,key,value){
+//   let i=0;
+//   for(;i<key.length-1;i++){
+//     if(obj[key[i]]===undefined){
+//       if(key[i].match(/^\d+$/)){
+//         obj[key[i]]=[];
+//       }else{
+//         obj[key[i]]={};
+//       }
+//     }
+//     obj=obj[key[i]];
+//   }
+//   obj[key[i]]=encodeURIComponent(value);
+
+// }
+
+
+
+
+
+function parse1(str){
+  let obj = str.split('&').reduce((pre,cur)=>{
+      let [key,value]=cur.split('=');
+      // pre[key]=value;
+      let k = key.split(/[\[\]]/).filter(x=>x);
+      handle1(pre,k,value);
+      return pre;
+  },{});
+  return obj;
+}
+function handle1(obj,k,value){
+  let i =0;
+  for(;i<k.length-1;i++){
+    if(obj[k[i]]===undefined){
+      if(k[i+1].match(/^\d+$/)){
+        obj[k[i]]=[];
+      }else{
+        obj[k[i]]={};
+      }
+    }
+    obj = obj[k[i]];
+    console.log('122obj',obj);
+  }
+  
+  obj[k[i]]=encodeURIComponent(value);
+}
+
+console.log(parse1('a[0]=1&a[1]=2&c[name]=fox&c[company]=tecent&b=why'))
+
+
+
+function parse(str){
+  return str.split('&').reduce((prev,cur)=>{
+    let [key,value]=cur.split('=');
+    // prev[key]=value;
+    let k = key.split(/[\[\]]/).filter(x=>x);
+    handle(prev,k,value);
+    return prev;
+  },{});
+}
+function handle(obj,key,value){
+  let i=0;
+  for(;i<key.length;i++){
+    if(obj[key]===undefined){
+      if(obj[key[i+1]].match(/^\d+$/)){
+        obj[key[i]]=[];
+      }else{
+        obj[key[i]]={};
+      }
+    }
+    obj = obj[key[i]];
+  }
+  obj[key[i]]=encodeURIComponent(value);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function parse(str){
+  str.split('&').reduce((prev,cur)=>{
+    
+  },{});
+}

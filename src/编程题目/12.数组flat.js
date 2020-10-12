@@ -69,3 +69,11 @@ const flat = arr =>{
      return prev.concat(Array.isArray(cur)?flat(cur):cur);
   },[]);
 }
+
+
+
+const flat=arr=>{
+  return arr.reduce((pre,cur)=>{
+    return pre.concat(Array.isArray(cur)?flat(cur):cur);
+  },[]);
+}
