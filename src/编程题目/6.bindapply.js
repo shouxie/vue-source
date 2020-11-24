@@ -70,3 +70,22 @@ Function.prototype.bind=function(context,...args){
     fn.call(context,...arguments,...args);
   }
 }
+
+
+Function.prototype.call = function(context,...args){
+  context = context||window;
+  context.fn = this;
+  let res = context.fn(...args);
+  delete context.fn;
+  return res;
+}
+
+
+
+Function.prototype.bind=function(context,...args){
+  context = context || window;
+  let fn = this;
+  return function(){
+    fn.call(context,...args)
+  }
+}

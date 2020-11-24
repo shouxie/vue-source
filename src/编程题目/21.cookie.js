@@ -26,3 +26,12 @@ function getCookie(name){
     }
   }
 }
+
+
+function getCookie(name){
+  let cookie = document.cookie;
+  if(cookie.length){
+    let start = cookie.indexOf(name+'='),
+        end = cookie.indexOf(';',start);
+  }
+}

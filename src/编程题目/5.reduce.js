@@ -74,3 +74,18 @@ Array.prototype.reduce=function(callback,initVal){
   }
   return value;
 }
+
+
+
+
+Array.prototype.reduce=function(fn,initVal){
+  if(!Array.isArray(this)||typeof fn !== 'function' || !this.length) {
+    return [];
+  }
+  let hasInit = initVal !== undefined,
+      value = hasInit ? initVal : this[0];
+  for(let i = hasInit ? 0:1;i<this.length;i++){
+    value = fn(value,this[i],i,this);
+  }
+  return value;
+}

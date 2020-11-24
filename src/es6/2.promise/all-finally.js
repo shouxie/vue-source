@@ -63,3 +63,15 @@ Promise.all = function(promises){
       }
   })
 }
+
+// 如果也想拿到失败的结果
+let fs = require('fs');
+const promisify = require('util').promisify
+const read = promisify(fs.readFile)
+
+Promise.all([read('./21.txt','utf8').catch(e=>e),1]).then((a)=>{
+  console.log(a)
+},err=>{
+  console.log('err','err',err)
+})
+

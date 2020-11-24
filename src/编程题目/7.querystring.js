@@ -168,9 +168,42 @@ function handle(obj,key,value){
 
 
 
-
-function parse(str){
-  str.split('&').reduce((prev,cur)=>{
-    
+const handle = (obj,key,value) =>{
+  let i =0;
+  for(;i<key.length;i++){
+    if(obj[key[i+1]] === undefined){
+      if(key[i+1].match(/^\d+$/)){
+        obj[key[i]] = [];
+      }else{
+        obj[key[i]] = {};
+      }
+    }
+    obj = obj[key[i]];
+  }
+  obj[key[i]] = encodeURIComponent(value);
+};
+const parse = (str) =>{
+  return str.split('&').reduce((prev,cur)=>{
+    let [key,value] = cur.split('=');
+    // prev[key]=value;
+    let k = key.split(/[\[\]]/).filter(x=>x);
+    handle(prev,k,value);
+    return prev;
   },{});
+};
+
+
+
+
+const handle = (obj,key,value) =>{
+  let i =0;
+  for(;i<key.length;i++){
+    if(key[i+1].match(/^\d+$/)){
+      obj[key[i]] = [];
+    }else{
+      obj[key[i]] = {};
+    }
+    obj = obj[obj[i]];
+  }
+  obj[key[i]] = encodeURIComponent(value);
 }

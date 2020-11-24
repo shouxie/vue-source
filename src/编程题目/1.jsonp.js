@@ -112,3 +112,50 @@ function jsonp(obj){
     })
   }
 }
+
+
+/*
+obj:{
+  url:'',
+  data:{}/''
+}
+*/
+
+const jsonp = (obj) =>{
+  return new Promise((resolve,reject)=>{
+    let script = document.createElement('script');
+    script.type="type/javascript";
+
+    let data = handle(obj.data),fn = `jsonp_${Date.now()}`;
+    if(data.indexOf('callback')===-1){
+      data = data + `callback=${fn}`;
+    }else{
+      fn = /callback=(\w+)/.exec(data)[1];
+    }
+    let url = obj.url + data;
+    script.src = url;
+
+    window[fn] = function(data){
+      if(data){
+        resolve(data);
+      }else{
+        reject('not data');
+      }
+      head.removeChild(script);
+    }
+    let head = document.querySelector('head');
+    head.appendChild(script);
+  });
+};
+
+const handle = (obj) =>{
+  if(typeof obj === 'object'){
+    return Object.keys(obj).reduce((prev,cur)=>{
+      prev = prev.concat(`${cur}=${obj[cur]}`);
+      return prev;
+    },[]).join('&');
+  } else {
+    return obj;
+  }
+};
+console.log(handle({a:'1',b:'2'}))

@@ -56,4 +56,21 @@ function currying(fn,...args){
 
 
 
+
+
+
+
+
+
+
+/*
+sum(1,2)
+sum(1)(2)
+*/
+function currying(fn,...args){
+  if(fn.length <= args.length) return fn(...args);
+  return function(...args1){
+    return currying(...args1,...args);
+  }
+
 }

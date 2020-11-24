@@ -77,3 +77,17 @@ const flat=arr=>{
     return pre.concat(Array.isArray(cur)?flat(cur):cur);
   },[]);
 }
+
+
+
+
+const flat = (arr) =>{
+  arr.reduce((prev,cur)=>{
+    prev = prev.concat(Array.isArray(cur) ? flat(cur) :cur);
+    return prev;
+  },[]);
+}
+
+const flat = (arr) =>{
+  JSON.stringify(arr).replace(/[\[\]]/,'');
+}

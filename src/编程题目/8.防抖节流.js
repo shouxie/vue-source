@@ -78,3 +78,30 @@ function throttle(fn,time){
     }, time);
   }
 }
+
+
+
+
+function debounce(fn,time){
+  let timer = null;
+  return function(){
+    if(timer) {
+      clearTimeout(timer);
+      timer = setTimeout(()=>{
+        fn.call(this,...arguments);
+      },time);
+    }
+  }
+}
+
+function throttle(fn,time){
+  let canRun = true;
+  return function(){
+    if(canRun===false)return;
+    canRun = false;
+    setTimeout(()=>{
+      fn.call(this,...arguments);
+      canRun = true;
+    },time);
+  }
+}

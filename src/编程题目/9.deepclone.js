@@ -47,3 +47,41 @@ function ddepclone(obj,hash=new WeakMap){
   }
   return instance
 }
+
+
+
+function deepclone (obj,hash=new WeakMap()) {
+  if(obj == undefined) return obj;
+  if(typeof obj === 'function') return obj;
+  if(obj instanceof RegExp) return obj;
+  let instance = new obj.constructor;
+  if(hash.has(obj)){
+    return hash.get(obj);
+  }
+  hash.set(obj,instance);
+  for(let key in obj){
+    if(obj.hasOwnProperty(key)){
+      instance[key] = deepclone(obj[key],hash);
+    }
+  }
+  return instance;
+}
+
+
+
+function deepclone(obj,hash=new WeakMap){
+  if(obj == undefined) return obj;
+  if(typeof obj === 'function') return obj;
+  if(type instanceof RegExp) return obj;
+  if(hash.get(obj)){
+    return hash.get(obj);
+  }
+  let instance = new obj.constructor;
+  hash.set(obj,instance);
+  for(let key in obj){
+    if(obj.hasOwnProperty(key)){
+      instance[key] = deepclone(obj[key],hash);
+    }
+  }
+  return instance;
+}

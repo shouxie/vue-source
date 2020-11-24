@@ -73,3 +73,44 @@ EventEmmitter1.prototype.once = function(eventName,callback){
   one.callback = callback // 自定义事件
   this.on(eventName,one) // 先绑定
 }
+
+
+
+
+class EventEmitter {
+  constructor(){
+    this.events = {};
+  }
+  on(eventName,callback){
+    if(!this.events) {
+      this.events = Object.create(null);
+    }
+    let calls = this.events[eventName] || [];
+    calls.push(callback);
+    this.events[eventName] = calls;
+  }
+  emit(eventName,...args){
+    this.events[eventName].forEach(fn=>{
+      fn.call(this,...args);
+    })
+  }
+  off(eventName,callback){
+    this.events[eventName] = this.events[eventName].filter(fn => fn !== callback);
+  }
+  once(name,fn){
+    const one = (...args) =>{
+      fn(...args);
+      this.off(name,one);
+    }
+    this.on(name,one);
+  }
+
+
+  once(name,callback){
+    const one = (...args) =>{
+      callback(...args);
+      this.off(name,one);
+    }
+    this.on(name,one)
+  }
+}

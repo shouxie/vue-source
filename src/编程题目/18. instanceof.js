@@ -25,3 +25,19 @@ function instanceof1(left,right){
     proto = proto.__proto__;
   }
 }
+
+
+
+
+
+function instanceOf2(left,right){
+  let proto = left.__proto__,
+      prototype = right.prototype;
+  while(true){
+    if(proto === undefined) return false;
+    else if (proto === prototype) return true;
+    else {
+      proto = proto.__proto__;
+    }
+  }
+}

@@ -32,3 +32,15 @@ function new1(fn,...args){
 	return typeof res === 'object' ? res : obj;
 
 }
+
+
+
+
+function _new (fn,...args){
+	let obj = {};
+	obj.__proto = fn.prototype;
+	let res = obj.call(fn,...args);
+	if(typeof res === 'object' || typeof res === 'function') return res;
+	return obj;
+
+}

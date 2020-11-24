@@ -69,3 +69,13 @@ function shuffle(arr){
 
 
 
+
+
+function shuffle(arr){
+  let l = arr.length;
+  while(l>1){
+    let m = Math.floor(Math.random()*l--);
+    [arr[m],arr[l]] = [arr[l],arr[m]];
+  }
+}
+

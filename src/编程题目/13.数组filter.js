@@ -47,3 +47,15 @@ function fil(fn,context){
   }
   return res;
 }
+
+
+Array.prototype.filter = function(fn,context){
+  let res = [];
+  for(let i =0;i<this.length;i++){
+    let temp = fn.call(context,this[i],i,this);
+    if(temp) {
+      res.push(temp);
+    }
+  }
+  return res;
+}

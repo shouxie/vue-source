@@ -21,4 +21,12 @@ let obj = {
     test:'test'
   }
 }
+
+const getVal = (obj, str) =>{
+  return str.split('.').reduce((prev,cur)=>{
+    if(!prev) return {};
+    return prev[cur];
+  },obj);
+};
+
 console.log(getVal(obj,'a.b.c.xx'));
